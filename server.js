@@ -1,9 +1,20 @@
 const express = require('express')
 const app = express()
 const path = require('path')
+const { logger } = require('./middleware/logger')
+const errorHandler = require('./middleware/errHandler')
+const cookieParser = require('cookie-parser')
+const cors = require('cors')
+const corsOption = require('./config/corsOptions')
 const PORT = process.env.PORT || 3000
 
+app.use(logger)
+
+app.use(cors(corsOption))
+
 app.use(express.json())
+
+app.use(cookieParser())
 
 app.use('/', express.static(path.join(__dirname, '/public')))
 
@@ -19,5 +30,7 @@ app.all('*', (req, res) => {
         res.type('txt').send('404 not found')
     }
 })
+
+app.use(errorHandler)
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
